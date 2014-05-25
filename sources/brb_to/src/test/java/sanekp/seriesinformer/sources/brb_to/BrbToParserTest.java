@@ -23,7 +23,8 @@ public class BrbToParserTest {
         BrbToParser parser = new BrbToParser();
         try {
             URL url = new URL("http://brb.to/video/serials/i13OZLQb0BigXzWzBOmu4g-sestra-dzheki.html");
-            parser.parse(url);
+            String file = parser.getNext(url, 3, 1, "1080");
+            System.out.println(file);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
