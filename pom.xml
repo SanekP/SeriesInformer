@@ -6,7 +6,11 @@
 
     <groupId>sanekp.seriesinformer</groupId>
     <artifactId>SeriesInformer</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>sources/brb_to</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
