@@ -24,6 +24,7 @@ public class BrbToParser {
         try {
             webClient = new WebClient();
             webClient.setAjaxController(new NicelyResynchronizingAjaxController());
+            webClient.getOptions().setThrowExceptionOnScriptError(false);
             HtmlPage htmlPage = webClient.getPage(url);
             HtmlElement listButton = htmlPage.getFirstByXPath("//div[@id='page-item-file-list']//a");
             listButton.click();
