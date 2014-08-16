@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://seriesinformer.sanekp"
+      xsi:schemaLocation="http://seriesinformer.sanekp dbschema.xsd">
+    <series>
+        <name>Game of Thrones</name>
+        <season>4</season>
+        <episode>10</episode>
+        <url>http://brb.to/video/serials/ifdtLsEYPLkQmOfjEkZFfO-igra-prestolov.html</url>
+    </series>
+    <series>
+        <name>The Walking Dead</name>
+        <season>4</season>
+        <episode>16</episode>
+        <url>http://brb.to/video/serials/i13P2ZgWBj7wrR4IdAS1O0-hodyachije-mertvecy.html</url>
+    </series>
+    <series>
+        <name>The Big Bang Theory</name>
+        <season>7</season>
+        <episode>24</episode>
+        <url>http://brb.to/video/serials/i3TEloA2B4eGCdx0A9Xelj2-teoriya-bolshogo-vzryva.html</url>
+    </series>
+    <series>
+        <name>Person of Interest</name>
+        <season>1</season>
+        <episode>15</episode>
+        <url>http://brb.to/video/serials/igdp23OQOkZsRC56XQFVeM-v-pole-zreniya.html</url>
+    </series>
+</list>
