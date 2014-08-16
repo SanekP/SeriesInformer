@@ -1,20 +1,19 @@
 package sanekp.seriesinformer.ui.xml;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
  * Created by sanek_000 on 5/25/2014.
  */
-@XmlType(propOrder = {"name", "season", "episode", "url"})
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "series", propOrder = {"name", "season", "episode", "url"})
 public class Series {
     private String name;
     private int season;
     private int episode;
     private String url;
 
+    @XmlElement(required = true)
     public String getName() {
         return name;
     }
@@ -39,6 +38,7 @@ public class Series {
         this.episode = episode;
     }
 
+    @XmlElement(required = true)
     public String getUrl() {
         return url;
     }
