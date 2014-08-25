@@ -27,6 +27,7 @@ public class Checker implements Runnable {
             boolean next = parser.isNext(series.getSeason(), series.getEpisode());
             if (next) {
                 trayIcon.displayMessage(series.getName(), "let's go to watch", TrayIcon.MessageType.INFO);
+                System.out.println(series.getName());
                 System.out.println(parser.getNext(series.getSeason(), series.getEpisode(), "1080"));
             }
         } catch (IOException e) {
