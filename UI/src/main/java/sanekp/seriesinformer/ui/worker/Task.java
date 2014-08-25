@@ -1,7 +1,7 @@
 package sanekp.seriesinformer.ui.worker;
 
-import sanekp.seriesinformer.ui.xml.Series;
-import sanekp.seriesinformer.ui.xml.SeriesList;
+import sanekp.seriesinformer.core.xml.Series;
+import sanekp.seriesinformer.core.xml.SeriesList;
 
 import java.awt.*;
 import java.util.concurrent.Executor;

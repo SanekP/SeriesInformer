@@ -1,4 +1,4 @@
-package sanekp.seriesinformer.ui.xml;
+package sanekp.seriesinformer.core.xml;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,6 +42,6 @@ public class XmlManagerTest {
         series.setName("Test name");
         seriesList.getSeries().add(series);
         URL folder = Thread.currentThread().getContextClassLoader().getResource("db");
-        xmlManager.save(seriesList, new File(new URI(folder.toString() + "/test.xml")));
+        xmlManager.save(seriesList, new File(new URI(folder.toString() + "/test.sanekp.seriesinformer.core.xml")));
     }
 }

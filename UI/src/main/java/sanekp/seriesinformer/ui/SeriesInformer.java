@@ -1,8 +1,8 @@
 package sanekp.seriesinformer.ui;
 
+import sanekp.seriesinformer.core.xml.SeriesList;
+import sanekp.seriesinformer.core.xml.XmlManager;
 import sanekp.seriesinformer.ui.worker.Task;
-import sanekp.seriesinformer.ui.xml.SeriesList;
-import sanekp.seriesinformer.ui.xml.XmlManager;
 
 import javax.xml.bind.JAXBException;
 import java.awt.*;

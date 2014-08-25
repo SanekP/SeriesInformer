@@ -1,7 +1,7 @@
 package sanekp.seriesinformer.ui.worker;
 
+import sanekp.seriesinformer.core.xml.Series;
 import sanekp.seriesinformer.sources.brb_to.BrbToParser;
-import sanekp.seriesinformer.ui.xml.Series;
 
 import java.awt.*;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package sanekp.seriesinformer.ui.xml;
+package sanekp.seriesinformer.core.xml;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
