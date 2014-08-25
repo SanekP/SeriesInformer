@@ -48,7 +48,7 @@ public class SeriesInformer {
             SeriesList seriesList = xmlManager.load(Thread.currentThread().getContextClassLoader().getResource("db/db.xml"));
             trayIcon.displayMessage("Series Informer", "Loaded " + seriesList.getSeries().size(), TrayIcon.MessageType.INFO);
             Task task = new Task(cachedThreadPool, seriesList, trayIcon);
-            scheduledExecutorService.scheduleAtFixedRate(task, 0, 1, TimeUnit.MINUTES);
+            scheduledExecutorService.scheduleAtFixedRate(task, 0, 30, TimeUnit.MINUTES);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
