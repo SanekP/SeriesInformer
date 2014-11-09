@@ -28,6 +28,7 @@ public class BrbToParser implements Closeable {
         webClient = new WebClient();
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());
         webClient.getOptions().setThrowExceptionOnScriptError(false);
+        webClient.getOptions().setCssEnabled(false);
     }
 
     public void open(URL url) throws IOException {
@@ -102,7 +103,7 @@ public class BrbToParser implements Closeable {
                     }
                 }
             }
-            episode = 1;    //  if there is no more episodes, let's take first from next season
+            episode = 0;    //  if there is no more episodes, let's take first from next season
         }
         return null;    //  specified season was not found
     }
