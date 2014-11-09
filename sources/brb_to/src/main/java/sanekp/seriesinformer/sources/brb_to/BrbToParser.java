@@ -90,7 +90,7 @@ public class BrbToParser implements Closeable {
             for (HtmlElement releaseElement : releaseElements) {
                 HtmlElement releaseButton = releaseElement.getFirstByXPath("./div[2]/a[1]");
                 releaseButton.click();
-                List<HtmlAnchor> links = (List<HtmlAnchor>) releaseElement.getByXPath("//a[@class='b-file-new__link-material-download']");
+                List<HtmlAnchor> links = (List<HtmlAnchor>) releaseElement.getByXPath(".//a[@class='b-file-new__link-material-download']");
 //                System.out.println("Links: " + links.size());
                 for (HtmlAnchor link : links) {
                     String file = link.getHrefAttribute();

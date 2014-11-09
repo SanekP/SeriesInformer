@@ -23,6 +23,7 @@ public class SeriesInformer {
     public static void main(String[] args) {
         Logger logger = Logger.getLogger("com.gargoylesoftware");
         logger.setLevel(Level.OFF);
+        Logger.getLogger("org.apache.http.client").setLevel(Level.OFF);
         URL resource = Thread.currentThread().getContextClassLoader().getResource("images/tray.png");
         Image image = Toolkit.getDefaultToolkit().getImage(resource);
         final SystemTray systemTray = SystemTray.getSystemTray();
