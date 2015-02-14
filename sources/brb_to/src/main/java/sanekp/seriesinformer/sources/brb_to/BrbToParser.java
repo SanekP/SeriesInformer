@@ -1,5 +1,6 @@
 package sanekp.seriesinformer.sources.brb_to;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
@@ -18,14 +19,14 @@ import java.util.regex.Pattern;
  */
 public class BrbToParser implements Closeable {
     private static final String STATUS_XPATH = "//div[@class='item-info']/table/tbody/tr[3]/td[2]";
+    static Pattern statusPattern = Pattern.compile("\\D+(\\d+)\\D+(\\d+)\\D+");
     private static Pattern numberPattern = Pattern.compile("\\d+");
     private static Pattern episodePattern = Pattern.compile("s\\d+e(\\d+)", Pattern.CASE_INSENSITIVE);
-    private static Pattern statusPattern = Pattern.compile("(\\d+)\\D+(\\d+)");
     private WebClient webClient;
     private HtmlPage htmlPage;
 
     public BrbToParser() {
-        webClient = new WebClient();
+        webClient = new WebClient(BrowserVersion.CHROME);
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setCssEnabled(false);
@@ -45,7 +46,7 @@ public class BrbToParser implements Closeable {
     public boolean isNext(int season, int episode) {
         HtmlElement status = htmlPage.getFirstByXPath(STATUS_XPATH);
         Matcher statusMatcher = statusPattern.matcher(status.getTextContent());
-        if (!statusMatcher.find()) {
+        if (!statusMatcher.matches()) {
             return false;   //  can not check
         }
         int fetchedSeason = Integer.valueOf(statusMatcher.group(1));
@@ -68,7 +69,7 @@ public class BrbToParser implements Closeable {
      * @return
      * @throws IOException
      */
-    public String getNext(int season, int episode, String quality) throws IOException {
+    public String getNext(final int season, final int episode, String quality) throws IOException {
         HtmlElement listButton = htmlPage.getFirstByXPath("//div[@id='page-item-file-list']//a");
         listButton.click();
         List<HtmlElement> seasonElements = (List<HtmlElement>) htmlPage.getByXPath("//div[@class='b-files-folders']//li[@class='folder' and contains(.//b/text(), 'сезон')]");
@@ -78,34 +79,48 @@ public class BrbToParser implements Closeable {
             if (!seasonMatcher.find()) {
                 continue;   //  it's not a season
             }
-            if (Integer.parseInt(seasonMatcher.group()) < season) {
+            int foundSeason = Integer.parseInt(seasonMatcher.group());
+            if (foundSeason < season) {
                 continue;   //  it's less than needed
             }
 //            String date = ((HtmlElement) seasonElement.getFirstByXPath("span[@class='material-date']")).getTextContent();
 //            System.out.println(name + " " + date);
+            final int desiredEpisode = foundSeason == season ? episode : 0; //  if there is no more episodes, let's take first from next season
             HtmlElement seasonButton = seasonElement.getFirstByXPath(".//a");
             seasonButton.click();
-            List<HtmlElement> releaseElements = (List<HtmlElement>) seasonElement.getByXPath(".//li[@class='folder' and contains(.//span[@class='material-size']/text(), '(" + quality + ")')]");
-//            System.out.println("Releases: " + releaseElements.size());
-            for (HtmlElement releaseElement : releaseElements) {
-                HtmlElement releaseButton = releaseElement.getFirstByXPath("./div[2]/a[1]");
-                releaseButton.click();
-                List<HtmlAnchor> links = (List<HtmlAnchor>) releaseElement.getByXPath(".//a[@class='b-file-new__link-material-download']");
-//                System.out.println("Links: " + links.size());
-                for (HtmlAnchor link : links) {
-                    String file = link.getHrefAttribute();
-                    Matcher episodeMatcher = episodePattern.matcher(file);
-                    if (!episodeMatcher.find()) {
-                        continue;   //  it's not an episode
-                    }
-                    if (Integer.parseInt(episodeMatcher.group(1)) > episode) {
-                        return "http://brb.to" + file;
-                    }
-                }
-            }
-            episode = 0;    //  if there is no more episodes, let's take first from next season
+            List<HtmlElement> languages = (List<HtmlElement>) seasonElement.getByXPath(".//li[@class='folder folder-language ']");
+            languages.stream().filter(language -> {
+                HtmlElement languageButton = language.getFirstByXPath("./div/a");
+                click(languageButton);
+                List<HtmlElement> translations = (List<HtmlElement>) language.getByXPath(".//li[@class='folder folder-translation ' and contains(div/div/a/text(), '" + quality + "')]");
+                return translations.stream().filter(translation -> {
+                    HtmlElement translationButton = translation.getFirstByXPath("./div/a[@class='link-subtype title']");
+                    click(translationButton);
+                    List<HtmlAnchor> links = (List<HtmlAnchor>) translation.getByXPath(".//a[@class='b-file-new__link-material-download']");
+                    return links.stream().filter(link -> {
+                        String file = link.getHrefAttribute();
+                        Matcher episodeMatcher = episodePattern.matcher(file);
+                        if (!episodeMatcher.find()) {
+                            return false;   //  it isn't an episode
+                        }
+                        if (Integer.parseInt(episodeMatcher.group(1)) > desiredEpisode) {
+                            System.out.println("http://brb.to" + file);
+                            return true;
+                        }
+                        return false;
+                    }).findFirst().isPresent();
+                }).findFirst().isPresent();
+            }).findFirst();
         }
         return null;    //  specified season was not found
+    }
+
+    private void click(HtmlElement htmlElement) {
+        try {
+            htmlElement.click();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

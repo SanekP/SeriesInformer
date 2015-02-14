@@ -35,21 +35,21 @@ public class SeriesInformer {
             e.printStackTrace();
         }
         final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        final ExecutorService cachedThreadPool = Executors.newCachedThreadPool();
+        final ExecutorService threadPool = Executors.newSingleThreadExecutor();
         trayIcon.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 systemTray.remove(trayIcon);
                 scheduledExecutorService.shutdownNow();
-                cachedThreadPool.shutdownNow();
+                threadPool.shutdownNow();
             }
         });
         try {
             XmlManager xmlManager = new XmlManager();
             SeriesList seriesList = xmlManager.load(Thread.currentThread().getContextClassLoader().getResource("db/db.xml"));
             trayIcon.displayMessage("Series Informer", "Loaded " + seriesList.getSeries().size(), TrayIcon.MessageType.INFO);
-            Task task = new Task(cachedThreadPool, seriesList, trayIcon);
-            scheduledExecutorService.scheduleAtFixedRate(task, 0, 30, TimeUnit.MINUTES);
+            Task task = new Task(threadPool, seriesList, trayIcon);
+            scheduledExecutorService.scheduleAtFixedRate(task, 0, 45, TimeUnit.MINUTES);
         } catch (JAXBException e) {
             e.printStackTrace();
         }
