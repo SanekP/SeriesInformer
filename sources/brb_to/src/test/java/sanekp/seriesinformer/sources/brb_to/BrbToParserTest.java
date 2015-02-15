@@ -45,6 +45,7 @@ public class BrbToParserTest {
         String file = parser.getNext(7, 18, "1080p");
         System.out.println(file);
         MatcherAssert.assertThat(file, CoreMatchers.notNullValue());
+        MatcherAssert.assertThat(file, CoreMatchers.containsString("1080"));
     }
 
     @After

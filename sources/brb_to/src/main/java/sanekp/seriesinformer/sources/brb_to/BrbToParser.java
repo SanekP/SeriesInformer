@@ -24,6 +24,9 @@ public class BrbToParser implements Closeable {
     private static Pattern episodePattern = Pattern.compile("s\\d+e(\\d+)", Pattern.CASE_INSENSITIVE);
     private WebClient webClient;
     private HtmlPage htmlPage;
+    private int season;
+    private int episode;
+    private String url;
 
     public BrbToParser() {
         webClient = new WebClient(BrowserVersion.CHROME);
@@ -83,6 +86,7 @@ public class BrbToParser implements Closeable {
             if (foundSeason < season) {
                 continue;   //  it's less than needed
             }
+            this.season = foundSeason;
 //            String date = ((HtmlElement) seasonElement.getFirstByXPath("span[@class='material-date']")).getTextContent();
 //            System.out.println(name + " " + date);
             final int desiredEpisode = foundSeason == season ? episode : 0; //  if there is no more episodes, let's take first from next season
@@ -96,21 +100,30 @@ public class BrbToParser implements Closeable {
                 return translations.stream().filter(translation -> {
                     HtmlElement translationButton = translation.getFirstByXPath("./div/a[@class='link-subtype title']");
                     click(translationButton);
-                    List<HtmlAnchor> links = (List<HtmlAnchor>) translation.getByXPath(".//a[@class='b-file-new__link-material-download']");
-                    return links.stream().filter(link -> {
+//                    HtmlElement qualityButton = translation.getFirstByXPath("./div/div/a");
+//                    click(qualityButton);
+                    List<HtmlElement> lis = (List<HtmlElement>) translation.getByXPath("./ul/li[contains(span/text(), '" + quality + "')]");
+                    return lis.stream().filter(li -> {
+                        HtmlAnchor link = li.getFirstByXPath(".//a[@class='b-file-new__link-material-download']");
                         String file = link.getHrefAttribute();
                         Matcher episodeMatcher = episodePattern.matcher(file);
                         if (!episodeMatcher.find()) {
                             return false;   //  it isn't an episode
                         }
-                        if (Integer.parseInt(episodeMatcher.group(1)) > desiredEpisode) {
-                            System.out.println("http://brb.to" + file);
+                        int foundEpisode = Integer.parseInt(episodeMatcher.group(1));
+                        if (foundEpisode > desiredEpisode) {
+                            this.episode = foundEpisode;
+                            url = "http://brb.to" + file;
+                            System.out.println(url);
                             return true;
                         }
                         return false;
                     }).findFirst().isPresent();
                 }).findFirst().isPresent();
             }).findFirst();
+            if (url != null) {
+                return url;
+            }
         }
         return null;    //  specified season was not found
     }
