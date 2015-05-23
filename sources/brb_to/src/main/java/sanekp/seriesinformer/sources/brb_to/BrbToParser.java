@@ -8,9 +8,12 @@ import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +23,7 @@ import java.util.regex.Pattern;
 public class BrbToParser implements Closeable {
     private static final String STATUS_XPATH = "//div[@class='item-info']/table/tbody/tr[3]/td[2]";
     static Pattern statusPattern = Pattern.compile("\\D+(\\d+)\\D+(\\d+)\\D+");
+    private static Logger logger = Logger.getLogger(BrbToParser.class.getName());
     private static Pattern numberPattern = Pattern.compile("\\d+");
     private static Pattern episodePattern = Pattern.compile("s\\d+e(\\d+)", Pattern.CASE_INSENSITIVE);
     private WebClient webClient;
@@ -75,7 +79,8 @@ public class BrbToParser implements Closeable {
     public String getNext(final int season, final int episode, String quality) throws IOException {
         HtmlElement listButton = htmlPage.getFirstByXPath("//div[@id='page-item-file-list']//a");
         listButton.click();
-        List<HtmlElement> seasonElements = (List<HtmlElement>) htmlPage.getByXPath("//div[@class='b-files-folders']//li[@class='folder' and contains(.//b/text(), 'сезон')]");
+//        List<HtmlElement> seasonElements = (List<HtmlElement>) htmlPage.getByXPath("//div[@class='b-files-folders']//li[@class='folder' and contains(.//b/text(), 'сезон')]");
+        List<HtmlElement> seasonElements = (List<HtmlElement>) htmlPage.getByXPath("//div[@class='b-files-folders']//li[@class='folder']");
         for (HtmlElement seasonElement : seasonElements) {
             String name = ((HtmlElement) seasonElement.getFirstByXPath(".//a/b")).getTextContent();
             Matcher seasonMatcher = numberPattern.matcher(name);
@@ -104,7 +109,12 @@ public class BrbToParser implements Closeable {
 //                    click(qualityButton);
                     List<HtmlElement> lis = (List<HtmlElement>) translation.getByXPath("./ul/li[contains(span/text(), '" + quality + "')]");
                     return lis.stream().filter(li -> {
-                        HtmlAnchor link = li.getFirstByXPath(".//a[@class='b-file-new__link-material-download']");
+                        logger.log(Level.FINE, " looking in {0}", li.asText());
+                        HtmlAnchor link = li.getFirstByXPath(".//a[contains(@class, 'b-file-new__link-material-download')]");
+                        if (link == null) {
+                            logger.log(Level.WARNING, "download link not found for {0}", li);
+                            return false;
+                        }
                         String file = link.getHrefAttribute();
                         Matcher episodeMatcher = episodePattern.matcher(file);
                         if (!episodeMatcher.find()) {
@@ -114,7 +124,7 @@ public class BrbToParser implements Closeable {
                         if (foundEpisode > desiredEpisode) {
                             this.episode = foundEpisode;
                             url = "http://brb.to" + file;
-                            System.out.println(url);
+                            logger.log(Level.FINE, "Found. url={0}", url);
                             return true;
                         }
                         return false;
@@ -124,6 +134,7 @@ public class BrbToParser implements Closeable {
             if (url != null) {
                 return url;
             }
+            logger.log(Level.FINE, "Looks like next episode hasn''t been found in season {0}", foundSeason);
         }
         return null;    //  specified season was not found
     }
@@ -136,8 +147,16 @@ public class BrbToParser implements Closeable {
         }
     }
 
+    public int getSeason() {
+        return season;
+    }
+
+    public int getEpisode() {
+        return episode;
+    }
+
     @Override
     public void close() throws IOException {
-        webClient.closeAllWindows();
+        webClient.close();
     }
 }

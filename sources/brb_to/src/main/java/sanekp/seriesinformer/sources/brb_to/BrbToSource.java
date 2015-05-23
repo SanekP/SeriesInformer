@@ -23,6 +23,8 @@ public class BrbToSource implements Source {
                 Series newSeries = new Series();
                 newSeries.setName(series.getName());
                 newSeries.setUrl(brbToParser.getNext(series.getSeason(), series.getEpisode(), "1080"));
+                newSeries.setSeason(brbToParser.getSeason());
+                newSeries.setEpisode(brbToParser.getEpisode());
                 return newSeries;
             }
         } catch (IOException e) {
