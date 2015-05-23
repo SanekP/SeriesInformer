@@ -37,6 +37,9 @@ public class Checker implements Runnable {
                 trayIcon.addActionListener(getActionListeners -> {
                     try {
                         Runtime.getRuntime().exec(new String[]{"C:/Program Files (x86)/DAUM/PotPlayer/PotPlayerMini.exe", next.getUrl()});
+                        logger.log(Level.INFO, "Viewed");
+                        series.setSeason(next.getSeason());
+                        series.setEpisode(next.getEpisode());
                     } catch (IOException e) {
                         logger.log(Level.WARNING, "Runtime.getRuntime().exec failed");
                     }

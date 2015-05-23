@@ -1,5 +1,7 @@
 package sanekp.seriesinformer.core.xml;
 
+import org.springframework.stereotype.Component;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -10,8 +12,8 @@ import java.net.URL;
 /**
  * Created by sanek_000 on 5/25/2014.
  */
+@Component
 public class XmlManager {
-
     private final JAXBContext jaxbContext;
     private Unmarshaller unmarshaller;
     private Marshaller marshaller;
