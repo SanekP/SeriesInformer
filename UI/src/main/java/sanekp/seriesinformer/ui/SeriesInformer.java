@@ -22,12 +22,15 @@ import java.util.logging.Logger;
 public class SeriesInformer {
     private static Logger logger = Logger.getLogger(SeriesInformer.class.getName());
 
-    public static void main(String[] args) {
+    static {
         try {
             LogManager.getLogManager().readConfiguration(SeriesInformer.class.getResourceAsStream("/logging.properties"));
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to read logger properties", e);
+            e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
         logger.log(Level.FINE, "Starting");
         URL resource = Thread.currentThread().getContextClassLoader().getResource("images/tray.png");
         Image image = Toolkit.getDefaultToolkit().getImage(resource);
