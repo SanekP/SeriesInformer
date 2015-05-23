@@ -33,13 +33,12 @@ public class Checker implements Runnable {
             if (next != null) {
                 logger.log(Level.FINE, "Next episode found for {0}", series.getName());
                 trayIcon.displayMessage(series.getName(), "let's go to watch s" + next.getSeason() + " e" + next.getEpisode(), TrayIcon.MessageType.INFO);
-                System.out.println(next.getUrl());
                 Arrays.stream(trayIcon.getActionListeners()).forEach(trayIcon::removeActionListener);
                 trayIcon.addActionListener(getActionListeners -> {
                     try {
                         Runtime.getRuntime().exec(new String[]{"C:/Program Files (x86)/DAUM/PotPlayer/PotPlayerMini.exe", next.getUrl()});
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.log(Level.WARNING, "Runtime.getRuntime().exec failed");
                     }
                 });
             } else {

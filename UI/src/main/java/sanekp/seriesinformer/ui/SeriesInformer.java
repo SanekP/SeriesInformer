@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  * Created by sanek_000 on 8/9/2014.
  */
 public class SeriesInformer {
-    private static Logger logger = Logger.getLogger(SeriesInformer.class.getName());
+    private static Logger logger;
 
     static {
         try {
@@ -28,6 +28,7 @@ public class SeriesInformer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        logger = Logger.getLogger(SeriesInformer.class.getName());
     }
 
     public static void main(String[] args) {
