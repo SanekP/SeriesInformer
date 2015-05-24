@@ -46,6 +46,7 @@ public class TrayManager {
 
     @PreDestroy
     public void close() {
+        // don't do this in shutdown hook
         systemTray.remove(trayIcon);
     }
 }
