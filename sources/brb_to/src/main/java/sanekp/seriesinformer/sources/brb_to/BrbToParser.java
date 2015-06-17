@@ -8,7 +8,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
@@ -81,15 +80,18 @@ public class BrbToParser implements Closeable {
         listButton.click();
 //        List<HtmlElement> seasonElements = (List<HtmlElement>) htmlPage.getByXPath("//div[@class='b-files-folders']//li[@class='folder' and contains(.//b/text(), 'сезон')]");
         List<HtmlElement> seasonElements = (List<HtmlElement>) htmlPage.getByXPath("//div[@class='b-files-folders']//li[@class='folder']");
+        logger.log(Level.FINE, "Looking through {0} season elements", seasonElements.size());
         for (HtmlElement seasonElement : seasonElements) {
             String name = ((HtmlElement) seasonElement.getFirstByXPath(".//a/b")).getTextContent();
             Matcher seasonMatcher = numberPattern.matcher(name);
             if (!seasonMatcher.find()) {
-                continue;   //  it's not a season
+                logger.log(Level.FINE, "{0} not a season", name);
+                continue;
             }
             int foundSeason = Integer.parseInt(seasonMatcher.group());
             if (foundSeason < season) {
-                continue;   //  it's less than needed
+                logger.log(Level.FINE, "season {0} less than needed {1}", new Object[]{foundSeason, season});
+                continue;
             }
             this.season = foundSeason;
 //            String date = ((HtmlElement) seasonElement.getFirstByXPath("span[@class='material-date']")).getTextContent();
@@ -136,6 +138,7 @@ public class BrbToParser implements Closeable {
             }
             logger.log(Level.FINE, "Looks like next episode hasn''t been found in season {0}", foundSeason);
         }
+        logger.log(Level.WARNING, "specified season {0} was not found", season);
         return null;    //  specified season was not found
     }
 

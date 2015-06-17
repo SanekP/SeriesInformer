@@ -1,11 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<list xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns="http://seriesinformer.sanekp"
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<list xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://seriesinformer.sanekp"
       xsi:schemaLocation="http://seriesinformer.sanekp dbschema.xsd">
     <series>
         <name>Game of Thrones</name>
-        <season>4</season>
-        <episode>10</episode>
+        <season>5</season>
+        <episode>3</episode>
         <url>http://brb.to/video/serials/ifdtLsEYPLkQmOfjEkZFfO-igra-prestolov.html</url>
     </series>
     <series>
@@ -23,7 +22,7 @@
     <series>
         <name>Agents of S.H.I.E.L.D</name>
         <season>2</season>
-        <episode>17</episode>
+        <episode>22</episode>
         <url>http://fs.to/video/serials/i2I0ekFTZjAcTn3SQDzEZ44-agenty-shh-i-t.html</url>
     </series>
     <series>

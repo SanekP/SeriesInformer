@@ -62,7 +62,7 @@ public class SeriesInformer {
 
     @Bean
     public File getDbPath() {
-        return new File("d:/db.xml");
+        return new File("Core/src/main/resources/db/db.xml");
     }
 
     public SeriesList loadSeries() {
