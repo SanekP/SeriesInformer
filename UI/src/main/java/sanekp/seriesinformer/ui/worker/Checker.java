@@ -24,7 +24,8 @@ public class Checker implements Callable<Series> {
     @Override
     public Series call() throws Exception {
         for (Source source : sources) {
-            logger.log(Level.FINE, "Start looking for next episode for {0}", series.getName());
+            logger.log(Level.FINE, "Source {0}", source);
+            logger.log(Level.FINE, "Start looking for next episode for {0} s{1} e{2}", new Object[]{series.getName(), series.getSeason(), series.getEpisode()});
             Series next = source.getNext(series);
             if (next != null) {
                 logger.log(Level.FINE, "Next episode found for {0}", series.getName());

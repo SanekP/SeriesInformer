@@ -10,6 +10,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>sources/brb_to</module>
+        <module>sources/brb_to_v2</module>
         <module>UI</module>
         <module>Core</module>
     </modules>

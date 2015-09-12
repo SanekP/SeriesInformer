@@ -32,7 +32,7 @@ public class BrbToParser implements Closeable {
     private String url;
 
     public BrbToParser() {
-        webClient = new WebClient(BrowserVersion.CHROME);
+        webClient = new WebClient(BrowserVersion.INTERNET_EXPLORER_11);
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setCssEnabled(false);
@@ -76,9 +76,8 @@ public class BrbToParser implements Closeable {
      * @throws IOException
      */
     public String getNext(final int season, final int episode, String quality) throws IOException {
-        HtmlElement listButton = htmlPage.getFirstByXPath("//div[@id='page-item-file-list']//a");
+        HtmlElement listButton = htmlPage.getFirstByXPath("//div[@id='page-item-file-list']//a[@class='b-files-folders-link']");
         listButton.click();
-//        List<HtmlElement> seasonElements = (List<HtmlElement>) htmlPage.getByXPath("//div[@class='b-files-folders']//li[@class='folder' and contains(.//b/text(), 'сезон')]");
         List<HtmlElement> seasonElements = (List<HtmlElement>) htmlPage.getByXPath("//div[@class='b-files-folders']//li[@class='folder']");
         logger.log(Level.FINE, "Looking through {0} season elements", seasonElements.size());
         for (HtmlElement seasonElement : seasonElements) {

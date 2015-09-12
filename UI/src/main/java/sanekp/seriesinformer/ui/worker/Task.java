@@ -54,7 +54,7 @@ public class Task implements Runnable {
                                 trayManager.displayInfoMessage(nextSeries.getName(), "Let's go to watch s" + nextSeries.getSeason() + " e" + nextSeries.getEpisode());
                                 trayManager.setActionListener(() -> {
                                     try {
-                                        Runtime.getRuntime().exec(new String[]{"C:/Program Files (x86)/DAUM/PotPlayer/PotPlayerMini.exe", nextSeries.getUrl()});
+                                        Runtime.getRuntime().exec(new String[]{"C:\\Program Files (x86)\\DAUM\\PotPlayer\\PotPlayerMini.exe", nextSeries.getUrl()});
                                         logger.log(Level.INFO, "{0} has been viewed", nextSeries.getName());
                                         // TODO get rid of lookup same series
                                         for (Series series : seriesList.getSeries()) {
