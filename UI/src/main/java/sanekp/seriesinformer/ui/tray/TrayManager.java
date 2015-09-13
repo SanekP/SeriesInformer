@@ -1,6 +1,8 @@
 package sanekp.seriesinformer.ui.tray;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import sanekp.seriesinformer.ui.SeriesInformer;
 
 import javax.annotation.PreDestroy;
 import java.awt.*;
@@ -17,6 +19,8 @@ public class TrayManager {
     private static Logger logger = Logger.getLogger(TrayManager.class.getName());
     private SystemTray systemTray;
     private TrayIcon trayIcon;
+    @Autowired
+    private SeriesInformer seriesInformer;
 
     public TrayManager() {
         URL resource = Thread.currentThread().getContextClassLoader().getResource("images/tray.png");
@@ -24,6 +28,11 @@ public class TrayManager {
         systemTray = SystemTray.getSystemTray();
         trayIcon = new TrayIcon(image, "Series Informer");
         trayIcon.setImageAutoSize(true);
+        PopupMenu popupMenu = new PopupMenu();
+        MenuItem close = new MenuItem("Close");
+        close.addActionListener(e -> seriesInformer.exit());
+        popupMenu.add(close);
+        trayIcon.setPopupMenu(popupMenu);
         try {
             systemTray.add(trayIcon);
         } catch (AWTException e) {

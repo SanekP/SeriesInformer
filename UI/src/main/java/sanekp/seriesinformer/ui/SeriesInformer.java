@@ -1,5 +1,6 @@
 package sanekp.seriesinformer.ui;
 
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
@@ -9,6 +10,8 @@ import sanekp.seriesinformer.core.xml.XmlManager;
 import sanekp.seriesinformer.ui.tray.TrayManager;
 import sanekp.seriesinformer.ui.worker.Task;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +41,11 @@ public class SeriesInformer {
     }
 
     @Autowired
+    AnnotationConfigApplicationContext applicationContext;
+    ScheduledExecutorService scheduledExecutorService;
+    @Autowired
+    ObjectFactory<Task> taskFactory;
+    @Autowired
     private XmlManager xmlManager;
     @Autowired
     private TrayManager trayManager;
@@ -45,24 +53,21 @@ public class SeriesInformer {
     private File dbPath;
 
     public static void main(String[] args) {
-        logger.log(Level.FINE, "Starting");
         logger.log(Level.FINE, "Loading Spring context");
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(SeriesInformer.class);
         logger.log(Level.FINE, "Spring context is loaded");
-        final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        Task task = applicationContext.getBean(Task.class);
-        scheduledExecutorService.scheduleAtFixedRate(task, 0, 45, TimeUnit.MINUTES);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            logger.log(Level.INFO, "Shutting down");
-            scheduledExecutorService.shutdown();
-            applicationContext.close();
-            logger.log(Level.INFO, "Exiting");
-        }));
+        applicationContext.registerShutdownHook();
     }
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @PostConstruct
+    public void init() {
+        scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+        scheduledExecutorService.scheduleAtFixedRate(taskFactory.getObject(), 0, 45, TimeUnit.MINUTES);
     }
 
     @Bean
@@ -91,5 +96,15 @@ public class SeriesInformer {
         } catch (JAXBException e) {
             logger.log(Level.WARNING, "Failed to store", e);
         }
+    }
+
+    @PreDestroy
+    public void close() {
+        scheduledExecutorService.shutdown();
+    }
+
+    public void exit() {
+        logger.log(Level.INFO, "Shutting down");
+        applicationContext.close();
     }
 }
