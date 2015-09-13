@@ -34,6 +34,7 @@ public class Checker implements Callable<Series> {
                 logger.log(Level.FINE, "Next episode hasn''t been found for {0}", series.getName());
             }
         }
+        logger.log(Level.INFO, "Next series of {0} wasn''t found", series.getName());
         return null;
     }
 }
