@@ -1,10 +1,9 @@
 package sanekp.seriesinformer.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import sanekp.seriesinformer.core.xml.SeriesList;
 import sanekp.seriesinformer.core.xml.XmlManager;
 import sanekp.seriesinformer.ui.tray.TrayManager;
@@ -25,6 +24,7 @@ import java.util.logging.Logger;
  */
 @Configuration
 @ComponentScan(basePackages = "sanekp.seriesinformer")
+@PropertySource(value = {"file:prop.properties"}, ignoreResourceNotFound = false)
 public class SeriesInformer {
     private static Logger logger;
 
@@ -61,13 +61,18 @@ public class SeriesInformer {
     }
 
     @Bean
-    public File getDbPath() {
-        return new File("Core/src/main/resources/db/db.xml");
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    @Bean
+    public File getDbPath(@Value("${db.path}") String dbPath) {
+        return new File(dbPath);
     }
 
     public SeriesList loadSeries() {
         try {
-            logger.log(Level.FINE, "Loading series");
+            logger.log(Level.FINE, "Loading series from {0}", dbPath);
             SeriesList seriesList = xmlManager.load(dbPath);
             logger.log(Level.FINE, "{0} series are loaded", seriesList.getSeries().size());
             trayManager.displayInfoMessage("Loaded " + seriesList.getSeries().size());
