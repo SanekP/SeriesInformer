@@ -8,11 +8,11 @@ import javax.xml.bind.JAXBException;
  * Created by sanek_000 on 5/25/2014.
  */
 public class XmlManagerTest {
-    private XmlManager xmlManager;
+    private DbManager dbManager;
 
     @Before
     public void setUp() throws JAXBException {
-        xmlManager = new XmlManager();
+        dbManager = new DbManager();
     }
 
 //    @Test
@@ -31,6 +31,6 @@ public class XmlManagerTest {
 //        series.setName("Test name");
 //        seriesList.getSeries().add(series);
 //        URL folder = Thread.currentThread().getContextClassLoader().getResource("db");
-//        xmlManager.save(seriesList, new File(new URI(folder.toString() + "/test.sanekp.seriesinformer.core.xml")));
+//        xmlManager.update(seriesList, new File(new URI(folder.toString() + "/test.sanekp.seriesinformer.core.xml")));
 //    }
 }

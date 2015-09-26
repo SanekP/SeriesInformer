@@ -2,18 +2,12 @@ package sanekp.seriesinformer.ui;
 
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import sanekp.seriesinformer.core.xml.SeriesList;
-import sanekp.seriesinformer.core.xml.XmlManager;
-import sanekp.seriesinformer.ui.tray.TrayManager;
 import sanekp.seriesinformer.ui.worker.Task;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.xml.bind.JAXBException;
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -40,17 +34,12 @@ public class SeriesInformer {
         logger = Logger.getLogger(SeriesInformer.class.getName());
     }
 
+    private ScheduledExecutorService scheduledExecutorService;
+
     @Autowired
-    AnnotationConfigApplicationContext applicationContext;
-    ScheduledExecutorService scheduledExecutorService;
+    private AnnotationConfigApplicationContext applicationContext;
     @Autowired
-    ObjectFactory<Task> taskFactory;
-    @Autowired
-    private XmlManager xmlManager;
-    @Autowired
-    private TrayManager trayManager;
-    @Autowired
-    private File dbPath;
+    private ObjectFactory<Task> taskFactory;
 
     public static void main(String[] args) {
         logger.log(Level.FINE, "Loading Spring context");
@@ -68,34 +57,6 @@ public class SeriesInformer {
     public void init() {
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
         scheduledExecutorService.scheduleAtFixedRate(taskFactory.getObject(), 0, 45, TimeUnit.MINUTES);
-    }
-
-    @Bean
-    public File getDbPath(@Value("${db.path}") String dbPath) {
-        return new File(dbPath);
-    }
-
-    public SeriesList loadSeries() {
-        try {
-            logger.log(Level.FINE, "Loading series from {0}", dbPath);
-            SeriesList seriesList = xmlManager.load(dbPath);
-            logger.log(Level.FINE, "{0} series are loaded", seriesList.getSeries().size());
-            trayManager.displayInfoMessage("Loaded " + seriesList.getSeries().size());
-            return seriesList;
-        } catch (JAXBException e) {
-            logger.log(Level.WARNING, "Series loading failed", e);
-        }
-        return null;
-    }
-
-    public void saveSeries(SeriesList seriesList) {
-        try {
-            logger.log(Level.INFO, "Storing series");
-            xmlManager.save(seriesList, dbPath);
-            logger.log(Level.INFO, "Series are stored");
-        } catch (JAXBException e) {
-            logger.log(Level.WARNING, "Failed to store", e);
-        }
     }
 
     @PreDestroy

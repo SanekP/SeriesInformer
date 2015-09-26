@@ -3,9 +3,9 @@ package sanekp.seriesinformer.ui.worker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import sanekp.seriesinformer.core.xml.DbManager;
 import sanekp.seriesinformer.core.xml.Series;
 import sanekp.seriesinformer.core.xml.SeriesList;
-import sanekp.seriesinformer.ui.SeriesInformer;
 import sanekp.seriesinformer.ui.tray.TrayManager;
 
 import javax.annotation.PreDestroy;
@@ -22,8 +22,9 @@ public class Task implements Runnable {
     private static Logger logger = Logger.getLogger(Task.class.getName());
     private ExecutorService executorService;
     private CompletionService<Series> completionService;
+
     @Autowired
-    private SeriesInformer seriesInformer;
+    private DbManager dbManager;
     @Autowired
     private TrayManager trayManager;
 
@@ -38,7 +39,8 @@ public class Task implements Runnable {
     @Override
     public void run() {
         try {
-            SeriesList seriesList = seriesInformer.loadSeries();
+            SeriesList seriesList = dbManager.load();
+            trayManager.displayInfoMessage("Loaded " + seriesList.getSeries().size() + " series");
             seriesList.getSeries().forEach(series -> completionService.submit(new Checker(series)));
             for (int i = 0; i < seriesList.getSeries().size(); i++) {
                 try {
@@ -50,15 +52,7 @@ public class Task implements Runnable {
                             try {
                                 Runtime.getRuntime().exec(new String[]{player, nextSeries.getUrl()});
                                 logger.log(Level.INFO, "{0} has been viewed", nextSeries.getName());
-                                // TODO get rid of lookup same series
-                                for (Series series : seriesList.getSeries()) {
-                                    if (series.getName().equals(nextSeries.getName())) {
-                                        series.setSeason(nextSeries.getSeason());
-                                        series.setEpisode(nextSeries.getEpisode());
-                                        seriesInformer.saveSeries(seriesList);
-                                        break;
-                                    }
-                                }
+                                dbManager.update(nextSeries);
                             } catch (IOException e) {
                                 logger.log(Level.WARNING, "Runtime.getRuntime().exec failed", e);
                             }
@@ -71,6 +65,7 @@ public class Task implements Runnable {
         } catch (Exception e) {
             logger.log(Level.WARNING, "Exception encountered during scheduled task execution", e);
         }
+        trayManager.displayInfoMessage("The search is over");
     }
 
     @PreDestroy
