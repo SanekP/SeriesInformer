@@ -1,6 +1,7 @@
 package sanekp.seriesinformer.ui.worker;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import sanekp.seriesinformer.core.xml.Series;
 import sanekp.seriesinformer.core.xml.SeriesList;
@@ -26,6 +27,9 @@ public class Task implements Runnable {
     @Autowired
     private TrayManager trayManager;
 
+    @Value("${player}")
+    private String player;
+
     public Task() {
         executorService = Executors.newSingleThreadExecutor();
         completionService = new ExecutorCompletionService<>(executorService);
@@ -42,9 +46,9 @@ public class Task implements Runnable {
                     Series nextSeries = future.get();
                     if (nextSeries != null) {
                         trayManager.displayInfoMessage(nextSeries.getName(), "Let's go to watch s" + nextSeries.getSeason() + " e" + nextSeries.getEpisode());
-                        trayManager.setActionListener(() -> {
+                        trayManager.addMenuItem(nextSeries.getName(), () -> {
                             try {
-                                Runtime.getRuntime().exec(new String[]{"C:\\Program Files (x86)\\DAUM\\PotPlayer\\PotPlayerMini.exe", nextSeries.getUrl()});
+                                Runtime.getRuntime().exec(new String[]{player, nextSeries.getUrl()});
                                 logger.log(Level.INFO, "{0} has been viewed", nextSeries.getName());
                                 // TODO get rid of lookup same series
                                 for (Series series : seriesList.getSeries()) {
@@ -56,7 +60,7 @@ public class Task implements Runnable {
                                     }
                                 }
                             } catch (IOException e) {
-                                logger.log(Level.WARNING, "Runtime.getRuntime().exec failed");
+                                logger.log(Level.WARNING, "Runtime.getRuntime().exec failed", e);
                             }
                         });
                     }

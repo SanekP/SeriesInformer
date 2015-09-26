@@ -19,6 +19,8 @@ public class TrayManager {
     private static Logger logger = Logger.getLogger(TrayManager.class.getName());
     private SystemTray systemTray;
     private TrayIcon trayIcon;
+    private PopupMenu popupMenu;
+
     @Autowired
     private SeriesInformer seriesInformer;
 
@@ -28,7 +30,7 @@ public class TrayManager {
         systemTray = SystemTray.getSystemTray();
         trayIcon = new TrayIcon(image, "Series Informer");
         trayIcon.setImageAutoSize(true);
-        PopupMenu popupMenu = new PopupMenu();
+        popupMenu = new PopupMenu();
         MenuItem close = new MenuItem("Close");
         close.addActionListener(e -> seriesInformer.exit());
         popupMenu.add(close);
@@ -51,6 +53,15 @@ public class TrayManager {
     public void setActionListener(Runnable runnable) {
         Arrays.stream(trayIcon.getActionListeners()).forEach(trayIcon::removeActionListener);
         trayIcon.addActionListener(e -> runnable.run());
+    }
+
+    public void addMenuItem(String name, Runnable runnable) {
+        MenuItem close = new MenuItem(name);
+        close.addActionListener(e -> {
+            runnable.run();
+            popupMenu.remove(close);
+        });
+        popupMenu.add(close);
     }
 
     @PreDestroy
