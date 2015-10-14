@@ -16,13 +16,16 @@ public class BrbToSource implements Source {
     @Override
     public Series getNext(Series series) {
         try {
-            URL url = new URL(series.getUrl());
-            brbToParser.open(url);
+            brbToParser.open(new URL(series.getUrl()));
             boolean next = brbToParser.isNext(series.getSeason(), series.getEpisode());
             if (next) {
                 Series newSeries = new Series();
                 newSeries.setName(series.getName());
-                newSeries.setUrl(brbToParser.getNext(series.getSeason(), series.getEpisode(), "1080"));
+                String url = brbToParser.getNext(series.getSeason(), series.getEpisode(), "1080");
+                if (url == null) {
+                    return null;
+                }
+                newSeries.setUrl(url);
                 newSeries.setSeason(brbToParser.getSeason());
                 newSeries.setEpisode(brbToParser.getEpisode());
                 return newSeries;
