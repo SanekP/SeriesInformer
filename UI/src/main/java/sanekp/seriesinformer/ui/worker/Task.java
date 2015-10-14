@@ -48,7 +48,7 @@ public class Task implements Runnable {
                     Series nextSeries = future.get();
                     if (nextSeries != null) {
                         trayManager.displayInfoMessage(nextSeries.getName(), "Let's go to watch s" + nextSeries.getSeason() + " e" + nextSeries.getEpisode());
-                        trayManager.addMenuItem(nextSeries.getName(), () -> {
+                        trayManager.addMenuItem(nextSeries.getName() + " s" + nextSeries.getSeason() + "e" + nextSeries.getEpisode(), () -> {
                             try {
                                 Runtime.getRuntime().exec(new String[]{player, nextSeries.getUrl()});
                                 logger.log(Level.INFO, "{0} has been viewed", nextSeries.getName());
