@@ -100,17 +100,20 @@ public class BrbToParser implements Closeable {
             seasonButton.click();
             List<HtmlElement> languages = (List<HtmlElement>) seasonElement.getByXPath(".//li[@class='folder folder-language ']");
             languages.stream().filter(language -> {
+                logger.log(Level.FINE, ((HtmlElement) language.getFirstByXPath("div/a")).getTextContent());
                 HtmlElement languageButton = language.getFirstByXPath("./div/a");
                 click(languageButton);
-                List<HtmlElement> translations = (List<HtmlElement>) language.getByXPath(".//li[@class='folder folder-translation ' and contains(div/div/a/text(), '" + quality + "')]");
+                List<HtmlElement> translations = (List<HtmlElement>) language.getByXPath(".//li[contains(@class, 'folder-translation') and contains(div/div/a/text(), '" + quality + "')]");
+                logger.log(Level.FINE, "translations {0}", translations.size());
                 return translations.stream().filter(translation -> {
+                    logger.log(Level.FINE, "\t" + ((HtmlElement) translation.getFirstByXPath("div/a")).getTextContent());
                     HtmlElement translationButton = translation.getFirstByXPath("./div/a[@class='link-subtype title']");
                     click(translationButton);
 //                    HtmlElement qualityButton = translation.getFirstByXPath("./div/div/a");
 //                    click(qualityButton);
                     List<HtmlElement> lis = (List<HtmlElement>) translation.getByXPath("./ul/li[contains(span/text(), '" + quality + "')]");
                     return lis.stream().filter(li -> {
-                        logger.log(Level.FINE, " looking in {0}", li.asText());
+                        logger.log(Level.FINE, "\t\tlooking in {0}", li.asText());
                         HtmlAnchor link = li.getFirstByXPath(".//a[contains(@class, 'b-file-new__link-material-download')]");
                         if (link == null) {
                             logger.log(Level.WARNING, "download link not found for {0}", li);
