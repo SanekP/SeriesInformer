@@ -16,13 +16,13 @@
     <series>
         <name>The Big Bang Theory</name>
         <season>8</season>
-        <episode>10</episode>
+        <episode>15</episode>
         <url>http://brb.to/video/serials/i3TEloA2B4eGCdx0A9Xelj2-teoriya-bolshogo-vzryva.html</url>
     </series>
     <series>
         <name>Agents of S.H.I.E.L.D</name>
-        <season>2</season>
-        <episode>22</episode>
+        <season>3</season>
+        <episode>2</episode>
         <url>http://fs.to/video/serials/i2I0ekFTZjAcTn3SQDzEZ44-agenty-shh-i-t.html</url>
     </series>
     <series>
@@ -36,5 +36,29 @@
         <season>2</season>
         <episode>5</episode>
         <url>http://brb.to/video/serials/ifdtHOAyPyMxTp0jaHePew-pod-kupolom.html</url>
+    </series>
+    <series>
+        <name>Mr. Robot</name>
+        <season>1</season>
+        <episode>10</episode>
+        <url>http://fs.to/video/serials/iw58NuFBdGjSnp76oTETVC-mister-robot.html</url>
+    </series>
+    <series>
+        <name>Fear the Walking Dead</name>
+        <season>1</season>
+        <episode>0</episode>
+        <url>http://fs.to/video/serials/i4pC9U7QEMTgMsznH9hFrI4-bojtes-khodyachih-mertvecov.html</url>
+    </series>
+    <series>
+        <name>Castle</name>
+        <season>7</season>
+        <episode>21</episode>
+        <url>http://fs.to/video/serials/i4ELvFbodP7u3YGBACYSPqo-kasl.html</url>
+    </series>
+    <series>
+        <name>House of Cards</name>
+        <season>0</season>
+        <episode>0</episode>
+        <url>http://fs.to/video/serials/iMaZnsM0Bu9XUrykJcMbG8-kartochnyj-domik.html</url>
     </series>
 </list>
