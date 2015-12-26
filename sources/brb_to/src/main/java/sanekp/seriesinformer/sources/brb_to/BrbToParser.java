@@ -50,6 +50,8 @@ public class BrbToParser implements Closeable {
      * @return true if there season bigger or episode bigger
      */
     public boolean isNext(int season, int episode) {
+        if (true)
+            return true;
         HtmlElement status = htmlPage.getFirstByXPath(STATUS_XPATH);
         Matcher statusMatcher = statusPattern.matcher(status.getTextContent());
         if (!statusMatcher.matches()) {
