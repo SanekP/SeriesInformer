@@ -1,11 +1,10 @@
 package sanekp.seriesinformer.sources.brb_to;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
-import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.util.FalsifyingWebConnection;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -36,6 +35,17 @@ public class BrbToParser implements Closeable {
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setCssEnabled(false);
+        webClient.setWebConnection(new FalsifyingWebConnection(webClient.getWebConnection()) {
+            @Override
+            public WebResponse getResponse(WebRequest request) throws IOException {
+                String host = request.getUrl().getHost();
+                if (host.contains("brb.to") || host.contains("fs.to") || host.contains("dotua.org")) {
+                    return super.getResponse(request);
+                } else {
+                    return createWebResponse(request, "", "text/plain");
+                }
+            }
+        });
     }
 
     public void open(URL url) throws IOException {
