@@ -1,5 +1,6 @@
 package sanekp.seriesinformer.ui.tray;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import sanekp.seriesinformer.ui.SeriesInformer;
@@ -8,15 +9,14 @@ import javax.annotation.PreDestroy;
 import java.awt.*;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by sanek_000 on 5/24/2015.
  */
 @Component
 public class TrayManager {
-    private static Logger logger = Logger.getLogger(TrayManager.class.getName());
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TrayManager.class);
+
     private SystemTray systemTray;
     private TrayIcon trayIcon;
     private PopupMenu popupMenu;
@@ -38,7 +38,7 @@ public class TrayManager {
         try {
             systemTray.add(trayIcon);
         } catch (AWTException e) {
-            logger.log(Level.WARNING, "Failed to add icon to tray", e);
+            LOGGER.warn("Failed to add icon into tray", e);
         }
     }
 
@@ -47,6 +47,7 @@ public class TrayManager {
     }
 
     public void displayInfoMessage(String title, String message) {
+        LOGGER.info("{}:{}", title, message);
         trayIcon.displayMessage(title, message, TrayIcon.MessageType.INFO);
     }
 
