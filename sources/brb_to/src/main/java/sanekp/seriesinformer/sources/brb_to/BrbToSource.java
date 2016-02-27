@@ -21,7 +21,17 @@ public class BrbToSource implements Source {
             if (next) {
                 Series newSeries = new Series();
                 newSeries.setName(series.getName());
-                String url = brbToParser.getNext(series.getSeason(), series.getEpisode(), "1080");
+                String url = null;
+                if (series.getQuality().isEmpty()) {
+                    url = brbToParser.getNext(series.getSeason(), series.getEpisode(), "1080");
+                } else {
+                    for (String quality : series.getQuality()) {
+                        url = brbToParser.getNext(series.getSeason(), series.getEpisode(), quality);
+                        if (url != null) {
+                            break;
+                        }
+                    }
+                }
                 if (url == null) {
                     return null;
                 }
