@@ -31,7 +31,7 @@ public class BrbToParser implements Closeable {
     private String url;
 
     public BrbToParser() {
-        webClient = new WebClient(BrowserVersion.INTERNET_EXPLORER_11);
+        webClient = new WebClient(BrowserVersion.CHROME);
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setCssEnabled(false);
