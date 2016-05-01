@@ -1,5 +1,6 @@
 package sanekp.seriesinformer.ui.tray;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ import java.util.Arrays;
  */
 @Component
 public class TrayManager {
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TrayManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrayManager.class);
 
     private SystemTray systemTray;
     private TrayIcon trayIcon;

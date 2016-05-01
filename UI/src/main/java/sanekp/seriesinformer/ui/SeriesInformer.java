@@ -1,9 +1,12 @@
 package sanekp.seriesinformer.ui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import sanekp.seriesinformer.ui.tray.TrayManager;
 import sanekp.seriesinformer.ui.worker.Task;
 
 import javax.annotation.PostConstruct;
@@ -12,9 +15,7 @@ import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 /**
  * Created by sanek_000 on 8/9/2014.
@@ -23,15 +24,14 @@ import java.util.logging.Logger;
 @ComponentScan(basePackages = "sanekp.seriesinformer")
 @PropertySource(value = {"file:prop.properties"}, ignoreResourceNotFound = false)
 public class SeriesInformer {
-    private static Logger logger;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrayManager.class);
 
     static {
         try {
-            LogManager.getLogManager().readConfiguration(SeriesInformer.class.getResourceAsStream("/logging.properties"));
+            LogManager.getLogManager().readConfiguration(SeriesInformer.class.getResourceAsStream("/logging.properties"));  //  TODO get rid of jul
         } catch (IOException e) {
             e.printStackTrace();
         }
-        logger = Logger.getLogger(SeriesInformer.class.getName());
     }
 
     private ScheduledExecutorService scheduledExecutorService;
@@ -42,9 +42,9 @@ public class SeriesInformer {
     private ObjectFactory<Task> taskFactory;
 
     public static void main(String[] args) {
-        logger.log(Level.FINE, "Loading Spring context");
+        LOGGER.info("main thread has started");
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(SeriesInformer.class);
-        logger.log(Level.FINE, "Spring context is loaded");
+        LOGGER.debug("Spring context is loaded");
         applicationContext.registerShutdownHook();
     }
 
@@ -65,7 +65,7 @@ public class SeriesInformer {
     }
 
     public void exit() {
-        logger.log(Level.INFO, "Shutting down");
+        LOGGER.info("Shutting down");
         applicationContext.close();
     }
 }

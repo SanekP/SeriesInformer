@@ -1,19 +1,21 @@
 package sanekp.seriesinformer.ui.worker;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sanekp.seriesinformer.core.spi.Source;
 import sanekp.seriesinformer.core.spi.SourceManager;
 import sanekp.seriesinformer.core.xml.Series;
+import sanekp.seriesinformer.ui.tray.TrayManager;
 
 import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by sanek_000 on 8/9/2014.
  */
 public class Checker implements Callable<Series> {
-    private static Logger logger = Logger.getLogger(Checker.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrayManager.class);
+
     private Series series;
     private ServiceLoader<Source> sources = SourceManager.getSources();
 
@@ -24,17 +26,17 @@ public class Checker implements Callable<Series> {
     @Override
     public Series call() throws Exception {
         for (Source source : sources) {
-            logger.log(Level.FINE, "Source {0}", source);
-            logger.log(Level.FINE, "Start looking for next episode for {0} s{1} e{2}", new Object[]{series.getName(), series.getSeason(), series.getEpisode()});
+            LOGGER.debug("Source {0}", source);
+            LOGGER.debug("Start looking for next episode for {0} s{1} e{2}", series.getName(), series.getSeason(), series.getEpisode());
             Series next = source.getNext(series);
             if (next != null) {
-                logger.log(Level.FINE, "Next episode found for {0}", series.getName());
+                LOGGER.debug("Next episode found for {0}", series.getName());
                 return next;
             } else {
-                logger.log(Level.FINE, "Next episode hasn''t been found for {0}", series.getName());
+                LOGGER.debug("Next episode hasn''t been found for {0}", series.getName());
             }
         }
-        logger.log(Level.INFO, "Next series of {0} wasn''t found", series.getName());
+        LOGGER.debug("Next series of {0} wasn''t found", series.getName());
         return null;
     }
 }

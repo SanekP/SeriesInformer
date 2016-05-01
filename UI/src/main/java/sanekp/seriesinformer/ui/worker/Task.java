@@ -1,5 +1,7 @@
 package sanekp.seriesinformer.ui.worker;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,15 +13,14 @@ import sanekp.seriesinformer.ui.tray.TrayManager;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.concurrent.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by sanek_000 on 8/16/2014.
  */
 @Component
 public class Task implements Runnable {
-    private static Logger logger = Logger.getLogger(Task.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(TrayManager.class);
+
     private ExecutorService executorService;
     private CompletionService<Series> completionService;
 
@@ -55,19 +56,19 @@ public class Task implements Runnable {
                         trayManager.addMenuItem(nextSeries.getName() + " s" + nextSeries.getSeason() + "e" + nextSeries.getEpisode(), () -> {
                             try {
                                 Runtime.getRuntime().exec(new String[]{player, nextSeries.getUrl()});
-                                logger.log(Level.INFO, "{0} has been viewed", nextSeries.getName());
+                                LOGGER.info("opening {}", nextSeries.getUrl());
                                 dbManager.update(nextSeries);
                             } catch (IOException e) {
-                                logger.log(Level.WARNING, "Runtime.getRuntime().exec failed", e);
+                                LOGGER.warn("Runtime.getRuntime().exec failed", e);
                             }
                         });
                     }
                 } catch (InterruptedException | ExecutionException e) {
-                    logger.log(Level.WARNING, "Failed to get next series", e);
+                    LOGGER.warn("Failed to get next series", e);
                 }
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Exception encountered during scheduled task execution", e);
+            LOGGER.warn("Exception encountered during scheduled task execution", e);
         }
         trayManager.displayInfoMessage("The search is over");
     }
