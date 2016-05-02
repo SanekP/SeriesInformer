@@ -115,6 +115,7 @@ public class TrayManager {
             menuItem.setLabel(seriesDto.getName() + " s" + next.getSeason() + "e" + next.getEpisode());
             menuItem.setEnabled(true);
             MenuItem finalMenuItem = menuItem;
+            Arrays.stream(menuItem.getActionListeners()).forEach(menuItem::removeActionListener);
             menuItem.addActionListener(actionEvent -> {
                 finalMenuItem.setEnabled(false);
                 LOGGER.info("opening {}", seriesDto.getUrl());
