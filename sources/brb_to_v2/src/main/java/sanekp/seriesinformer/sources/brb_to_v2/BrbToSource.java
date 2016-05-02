@@ -3,6 +3,8 @@ package sanekp.seriesinformer.sources.brb_to_v2;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import sanekp.seriesinformer.core.model.Next;
+import sanekp.seriesinformer.core.model.SeriesDto;
 import sanekp.seriesinformer.core.spi.Source;
 import sanekp.seriesinformer.core.xml.Series;
 
@@ -14,19 +16,28 @@ import java.util.List;
  */
 public class BrbToSource implements Source {
     @Override
-    public Series getNext(Series series) {
+    public void getNext(SeriesDto seriesDto) {
         Series nextSeries = new Series();
-        nextSeries.setUrl(series.getUrl());
-        nextSeries.setSeason(series.getSeason());
-        nextSeries.setEpisode(series.getEpisode() + 1);
+        nextSeries.setUrl(seriesDto.getUrl());
+        nextSeries.setSeason(seriesDto.getViewed().getSeason());
+        nextSeries.setEpisode(seriesDto.getViewed().getEpisode() + 1);
         Series nextEpisode = tryNext(nextSeries);
         if (nextEpisode != null) {
-            return nextEpisode;
+            Next next = new Next();
+            next.setSeason(nextEpisode.getSeason());
+            next.setEpisode(nextEpisode.getEpisode());
+            next.setUrl(nextEpisode.getUrl());
+            seriesDto.setNext(next);
         } else {
             System.out.println("Let's try next season");
-            nextSeries.setSeason(series.getSeason() + 1);
+            nextSeries.setSeason(seriesDto.getViewed().getSeason() + 1);
             nextSeries.setEpisode(1);
-            return tryNext(nextSeries);
+            nextEpisode = tryNext(nextSeries);
+            Next next = new Next();
+            next.setSeason(nextEpisode.getSeason());
+            next.setEpisode(nextEpisode.getEpisode());
+            next.setUrl(nextEpisode.getUrl());
+            seriesDto.setNext(next);
         }
     }
 

@@ -1,17 +1,18 @@
 package sanekp.seriesinformer.sources.brb_to;
 
-import com.gargoylesoftware.htmlunit.*;
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
+import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.util.FalsifyingWebConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,9 +20,10 @@ import java.util.regex.Pattern;
  * Created by sanek_000 on 5/25/2014.
  */
 public class BrbToParser implements Closeable {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrbToParser.class);
+
     private static final String STATUS_XPATH = "//div[@class='item-info']/table/tbody/tr[3]/td[2]";
-    static Pattern statusPattern = Pattern.compile("\\D+(\\d+)\\D+(\\d+)\\D+");
-    private static Logger logger = Logger.getLogger(BrbToParser.class.getName());
+    private static Pattern statusPattern = Pattern.compile("\\D+(\\d+)\\D+(\\d+)\\D+");
     private static Pattern numberPattern = Pattern.compile("\\d+");
     private static Pattern episodePattern = Pattern.compile("s\\d+e(\\d+)", Pattern.CASE_INSENSITIVE);
     private WebClient webClient;
@@ -31,21 +33,21 @@ public class BrbToParser implements Closeable {
     private String url;
 
     public BrbToParser() {
-        webClient = new WebClient(BrowserVersion.CHROME);
+        webClient = new WebClient(BrowserVersion.BEST_SUPPORTED);
         webClient.setAjaxController(new NicelyResynchronizingAjaxController());
         webClient.getOptions().setThrowExceptionOnScriptError(false);
         webClient.getOptions().setCssEnabled(false);
-        webClient.setWebConnection(new FalsifyingWebConnection(webClient.getWebConnection()) {
-            @Override
-            public WebResponse getResponse(WebRequest request) throws IOException {
-                String host = request.getUrl().getHost();
-                if (host.contains("brb.to") || host.contains("fs.to") || host.contains("dotua.org")) {
-                    return super.getResponse(request);
-                } else {
-                    return createWebResponse(request, "", "text/plain");
-                }
-            }
-        });
+//        webClient.setWebConnection(new FalsifyingWebConnection(webClient.getWebConnection()) {
+//            @Override
+//            public WebResponse getResponse(WebRequest request) throws IOException {
+//                String host = request.getUrl().getHost();
+//                if (host.contains("brb.to") || host.contains("fs.to") || host.contains("dotua.org")) {
+//                    return super.getResponse(request);
+//                } else {
+//                    return createWebResponse(request, "", "text/plain");
+//                }
+//            }
+//        });
     }
 
     public void open(URL url) throws IOException {
@@ -91,17 +93,17 @@ public class BrbToParser implements Closeable {
         HtmlElement listButton = htmlPage.getFirstByXPath("//div[@id='page-item-file-list']//a[@class='b-files-folders-link']");
         listButton.click();
         List<HtmlElement> seasonElements = (List<HtmlElement>) htmlPage.getByXPath("//div[@class='b-files-folders']//li[@class='folder']");
-        logger.log(Level.FINE, "Looking through {0} season elements", seasonElements.size());
+        LOGGER.debug("Looking through {} season elements", seasonElements.size());
         for (HtmlElement seasonElement : seasonElements) {
             String name = ((HtmlElement) seasonElement.getFirstByXPath(".//a/b")).getTextContent();
             Matcher seasonMatcher = numberPattern.matcher(name);
             if (!seasonMatcher.find()) {
-                logger.log(Level.FINE, "{0} not a season", name);
+                LOGGER.debug("{} not a season", name);
                 continue;
             }
             int foundSeason = Integer.parseInt(seasonMatcher.group());
             if (foundSeason < season) {
-                logger.log(Level.FINE, "season {0} less than needed {1}", new Object[]{foundSeason, season});
+                LOGGER.debug("season {} less than needed {}", new Object[]{foundSeason, season});
                 continue;
             }
             this.season = foundSeason;
@@ -110,25 +112,25 @@ public class BrbToParser implements Closeable {
             final int desiredEpisode = foundSeason == season ? episode : 0; //  if there is no more episodes, let's take first from next season
             HtmlElement seasonButton = seasonElement.getFirstByXPath(".//a");
             seasonButton.click();
-            List<HtmlElement> languages = (List<HtmlElement>) seasonElement.getByXPath(".//li[@class='folder folder-language ']");
+            List<HtmlElement> languages = (List<HtmlElement>) seasonElement.getByXPath(".//li[contains(@class, 'folder-language')]");
             languages.stream().filter(language -> {
-                logger.log(Level.FINE, ((HtmlElement) language.getFirstByXPath("div/a")).getTextContent());
+                LOGGER.debug(((HtmlElement) language.getFirstByXPath("div/a")).getTextContent());
                 HtmlElement languageButton = language.getFirstByXPath("./div/a");
                 click(languageButton);
                 List<HtmlElement> translations = (List<HtmlElement>) language.getByXPath(".//li[contains(@class, 'folder-translation') and contains(div/div/a/text(), '" + quality + "')]");
-                logger.log(Level.FINE, "translations {0}", translations.size());
+                LOGGER.debug("translations {}", translations.size());
                 return translations.stream().filter(translation -> {
-                    logger.log(Level.FINE, "\t" + ((HtmlElement) translation.getFirstByXPath("div/a")).getTextContent());
+                    LOGGER.debug("\t" + ((HtmlElement) translation.getFirstByXPath("div/a")).getTextContent());
                     HtmlElement translationButton = translation.getFirstByXPath("./div/a[@class='link-subtype title']");
                     click(translationButton);
 //                    HtmlElement qualityButton = translation.getFirstByXPath("./div/div/a");
 //                    click(qualityButton);
                     List<HtmlElement> lis = (List<HtmlElement>) translation.getByXPath("./ul/li[contains(span/text(), '" + quality + "')]");
                     return lis.stream().filter(li -> {
-                        logger.log(Level.FINE, "\t\tlooking in {0}", li.asText());
+                        LOGGER.debug("\t\tlooking in {}", li.asText());
                         HtmlAnchor link = li.getFirstByXPath(".//a[contains(@class, 'b-file-new__link-material-download')]");
                         if (link == null) {
-                            logger.log(Level.WARNING, "download link not found for {0}", li);
+                            LOGGER.warn("download link not found for {}", li);
                             return false;
                         }
                         String file = link.getHrefAttribute();
@@ -140,7 +142,7 @@ public class BrbToParser implements Closeable {
                         if (foundEpisode > desiredEpisode) {
                             this.episode = foundEpisode;
                             url = "http://brb.to" + file;
-                            logger.log(Level.FINE, "Found. url={0}", url);
+                            LOGGER.debug("Found. url={}", url);
                             return true;
                         }
                         return false;
@@ -150,9 +152,9 @@ public class BrbToParser implements Closeable {
             if (url != null) {
                 return url;
             }
-            logger.log(Level.FINE, "Looks like next episode hasn''t been found in season {0}", foundSeason);
+            LOGGER.debug("Looks like next episode hasn't been found in season {}", foundSeason);
         }
-        logger.log(Level.WARNING, "specified season {0} was not found", season);
+        LOGGER.warn("specified season {} was not found", season);
         return null;    //  specified season was not found
     }
 

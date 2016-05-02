@@ -1,6 +1,7 @@
 package sanekp.seriesinformer.core.xml;
 
 import org.junit.Before;
+import sanekp.seriesinformer.core.manager.DbManager;
 
 import javax.xml.bind.JAXBException;
 

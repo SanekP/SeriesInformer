@@ -2,20 +2,20 @@ package sanekp.seriesinformer.ui;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import sanekp.seriesinformer.core.broker.Producer;
+import sanekp.seriesinformer.core.manager.DbManager;
+import sanekp.seriesinformer.core.model.SeriesDto;
 import sanekp.seriesinformer.ui.tray.TrayManager;
-import sanekp.seriesinformer.ui.worker.Task;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.LogManager;
 
 /**
  * Created by sanek_000 on 8/9/2014.
@@ -23,23 +23,20 @@ import java.util.logging.LogManager;
 @Configuration
 @ComponentScan(basePackages = "sanekp.seriesinformer")
 @PropertySource(value = {"file:prop.properties"}, ignoreResourceNotFound = false)
+@ImportResource("classpath:spring.xml")
 public class SeriesInformer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TrayManager.class);
-
-    static {
-        try {
-            LogManager.getLogManager().readConfiguration(SeriesInformer.class.getResourceAsStream("/logging.properties"));  //  TODO get rid of jul
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(SeriesInformer.class);
 
     private ScheduledExecutorService scheduledExecutorService;
 
     @Autowired
     private AnnotationConfigApplicationContext applicationContext;
     @Autowired
-    private ObjectFactory<Task> taskFactory;
+    private DbManager dbManager;
+    @Autowired
+    private TrayManager trayManager;
+    @Autowired
+    private Producer producer;
 
     public static void main(String[] args) {
         LOGGER.info("main thread has started");
@@ -56,16 +53,23 @@ public class SeriesInformer {
     @PostConstruct
     public void init() {
         scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        scheduledExecutorService.scheduleAtFixedRate(taskFactory.getObject(), 0, 45, TimeUnit.MINUTES);
+        scheduledExecutorService.scheduleAtFixedRate(this::checkNew, 0, 20, TimeUnit.MINUTES);
+        List<SeriesDto> seriesDtos = dbManager.getSeriesDtos();
+        trayManager.setSeriesDtos(seriesDtos);
     }
 
-    @PreDestroy
-    public void close() {
-        scheduledExecutorService.shutdown();
+    public void checkNew() {
+        List<SeriesDto> seriesDtos = dbManager.getSeriesDtos();
+        producer.lookFor(seriesDtos);
     }
 
     public void exit() {
         LOGGER.info("Shutting down");
         applicationContext.close();
+    }
+
+    @PreDestroy
+    public void close() {
+        scheduledExecutorService.shutdown();
     }
 }

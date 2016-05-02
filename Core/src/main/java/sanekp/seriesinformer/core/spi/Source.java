@@ -1,6 +1,6 @@
 package sanekp.seriesinformer.core.spi;
 
-import sanekp.seriesinformer.core.xml.Series;
+import sanekp.seriesinformer.core.model.SeriesDto;
 
 /**
  * Created by sanek_000 on 8/25/2014.
@@ -8,12 +8,9 @@ import sanekp.seriesinformer.core.xml.Series;
 public interface Source {
     /**
      * Searches for next episode
+     * Implementation should set <strong>next</strong> field
      *
-     * @param series contain catalog-url in url property
-     * @return next series where
-     * url property is file-url
-     * season and episode contain next values
-     * otherwise it returns null
+     * @param seriesDto instance of SeriesDto
      */
-    Series getNext(Series series);
+    void getNext(SeriesDto seriesDto);
 }

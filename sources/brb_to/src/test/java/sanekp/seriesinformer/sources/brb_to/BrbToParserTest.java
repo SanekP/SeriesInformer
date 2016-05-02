@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 
 /**
  * Created by sanek_000 on 5/25/2014.
@@ -26,12 +25,6 @@ public class BrbToParserTest {
         parser = new BrbToParser();
         URL url = new URL("http://brb.to/video/serials/i3TEloA2B4eGCdx0A9Xelj2-teoriya-bolshogo-vzryva.html");
         parser.open(url);
-    }
-
-    @Test
-    public void testStatusPattern() {
-        Matcher matcher = BrbToParser.statusPattern.matcher("\n                            сезон 08 серия 14  ");
-        MatcherAssert.assertThat(matcher.matches(), CoreMatchers.is(true));
     }
 
     @Test
