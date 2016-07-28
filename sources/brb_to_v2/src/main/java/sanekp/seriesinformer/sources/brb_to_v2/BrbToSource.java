@@ -3,6 +3,8 @@ package sanekp.seriesinformer.sources.brb_to_v2;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sanekp.seriesinformer.core.model.Next;
 import sanekp.seriesinformer.core.model.SeriesDto;
 import sanekp.seriesinformer.core.spi.Source;
@@ -15,6 +17,8 @@ import java.util.List;
  * Created by Sanek on 8/29/2015.
  */
 public class BrbToSource implements Source {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrbToSource.class);
+
     @Override
     public void getNext(SeriesDto seriesDto) {
         Series nextSeries = new Series();
@@ -33,11 +37,13 @@ public class BrbToSource implements Source {
             nextSeries.setSeason(seriesDto.getViewed().getSeason() + 1);
             nextSeries.setEpisode(1);
             nextEpisode = tryNext(nextSeries);
-            Next next = new Next();
-            next.setSeason(nextEpisode.getSeason());
-            next.setEpisode(nextEpisode.getEpisode());
-            next.setUrl(nextEpisode.getUrl());
-            seriesDto.setNext(next);
+            if (nextEpisode != null) {
+                Next next = new Next();
+                next.setSeason(nextEpisode.getSeason());
+                next.setEpisode(nextEpisode.getEpisode());
+                next.setUrl(nextEpisode.getUrl());
+                seriesDto.setNext(next);
+            }
         }
     }
 
